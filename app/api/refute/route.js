@@ -1,10 +1,8 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(req) {
   const { prompt } = await req.json();
@@ -12,13 +10,13 @@ export async function POST(req) {
   const fullPrompt = `Refute this antisemitic or anti-Israel claim in a factual, short, firm way: "${prompt}"`;
 
   try {
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: fullPrompt }],
       max_tokens: 400,
     });
 
-    const result = completion.data.choices[0].message.content;
+    const result = completion.choices[0].message.content;
     return new Response(JSON.stringify({ result }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
